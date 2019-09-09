@@ -1,3 +1,5 @@
+const LinkedList = require('../middleware/linkedList')
+
 const LanguageService = {
   getUsersLanguage(db, user_id) {
     return db
@@ -28,8 +30,32 @@ const LanguageService = {
       )
       .where({ language_id });
   },
-  getLanguageHead(db, language_id){
-    return db
+  getLanguageWordsTwo(db, language_id){
+     return db
+    .from('word')
+    .join('language', 'word.language_id', 'language.id')
+    .select(
+      'word.original',
+      'language.total_score',
+      'word.correct_count',
+      'word.incorrect_count'
+    )
+    .where({ language_id });
+    },
+
+  getLanguageHead(words){
+    console.log(words[0], words.length)
+  let list = new LinkedList()
+    list.insertFirst(words[0])
+    console.log(list)
+    let i = words.length-1
+    while(i > 0){
+      list.insertLast(words[i])
+      i--
+      
+    }
+   return list.head
+   /*  return db
       .from('word')
       .join('language', 'word.language_id', 'language.id')
       .select(
@@ -38,7 +64,7 @@ const LanguageService = {
         'word.correct_count',
         'word.incorrect_count'
       )
-      .where({ language_id });
+      .where({ language_id }); */
   }
 };
 
