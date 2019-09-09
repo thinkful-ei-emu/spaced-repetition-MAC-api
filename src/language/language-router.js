@@ -1,7 +1,7 @@
 const express = require('express')
 const LanguageService = require('./language-service')
 const { requireAuth } = require('../middleware/jwt-auth')
-
+const linkedList = require('../middleware/linkedList');
 const languageRouter = express.Router()
 
 languageRouter
@@ -32,7 +32,6 @@ languageRouter
         req.app.get('db'),
         req.language.id,
       )
-
       res.json({
         language: req.language,
         words,
@@ -46,18 +45,12 @@ languageRouter
 languageRouter
   .get('/head', async (req, res, next) => {
     try {
-      const listOfWords = await LanguageService.getLanguageHead(
+      const head = await LanguageService.getLanguageHead(
         req.app.get('db'),
         req.language.id,
       )
-      res.json(listOfWords
-      //   {
-      //   nextWord: head[0].original,
-      //   wordCorrectCount: head[0].correct_count,
-      //   wordIncorrectCount: head[0].incorrect_count,
-      //   totalScore: head[0].total_score
-      // }
-      )
+      let linkedWords = new linkedList();
+      linkedWords.insertFirst(head[0])
       next()
     } catch (error) {
       next(error)
