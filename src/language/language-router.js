@@ -44,12 +44,14 @@ languageRouter
 
 languageRouter
   .all('/head', async (req, res, next) => {
-    try {
-      const words = await LanguageService.getLanguageWordsTwo(
+    try {      
+      const head = await LanguageService.getLanguageHead(
         req.app.get('db'),
-        req.language.id,
+        req.language.head,
       )
-      res.words = words
+      
+      res.json(head)
+     
       next()
     } 
    catch (error) {

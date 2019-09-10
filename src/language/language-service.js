@@ -31,45 +31,19 @@ const LanguageService = {
       .where({ language_id });
   },
 
-  getLanguageWordsTwo(db, language_id){
+  getLanguageHead(db, language_head) {
     return db
       .from('word')
-      .join('language', 'word.language_id', 'language.id')
+      .join('language', 'word.id', 'language.head')
       .select(
+        'word.id',
         'word.original',
         'language.total_score',
         'word.correct_count',
         'word.incorrect_count'
-      )
-      .where({ language_id });
-  },
-  
-  getLanguageHead(words){
-    let list = new LinkedList();
-    list.insertFirst(words[0]);
-    let i = words.length-1;
-    while(i > 0){
-      list.insertLast(words[i]);
-      i--;
-    }
-    return list.head;
-  },
-  checkAnswer(guess, original, db, language_id){
-    return db
-    .from('word')
-    .join('language, word.language_id', 'language.id')
-    .select(
-      'language.total_score',
-      'word.correct_count',
-      'word.incorrect_count',
-      'word.translation',
-      'word.original'
-    )
-    .where({language_id})
-   // .andWhere('word.original', original)
+      );
 
-    
-  }
+  },
 };
 
 module.exports = LanguageService;
