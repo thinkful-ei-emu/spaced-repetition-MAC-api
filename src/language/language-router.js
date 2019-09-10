@@ -47,10 +47,9 @@ languageRouter
     try {      
       const head = await LanguageService.getLanguageHead(
         req.app.get('db'),
-        req.language.head,
+        req.language.id,
       )
-      
-      res.json(head)
+      res.head = head
      
       next()
     } 
@@ -59,8 +58,8 @@ languageRouter
     }
   })
 .get(jsonBodyParser, (req, res, next)=>{
-  
-    return res.json(res.head)
+    console.log(res.head)
+    return res.json(res.head[0])
 
 })
 

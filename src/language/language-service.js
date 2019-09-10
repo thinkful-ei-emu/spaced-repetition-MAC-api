@@ -31,17 +31,17 @@ const LanguageService = {
       .where({ language_id });
   },
 
-  getLanguageHead(db, language_head) {
+  getLanguageHead(db, language_id) {
     return db
       .from('word')
-      .join('language', 'word.id', 'language.head')
+      .join('language', 'word.id', 'language.id')
       .select(
-        'word.id',
-        'word.original',
-        'language.total_score',
-        'word.correct_count',
-        'word.incorrect_count'
-      );
+        'word.original AS nextWord',
+        'language.total_score AS totalScore',  
+        'word.correct_count AS wordCorrectCount',
+        'word.incorrect_count AS wordIncorrectCount'          
+        
+      ).where({ language_id });    
 
   },
 
