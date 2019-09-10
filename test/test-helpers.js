@@ -103,6 +103,12 @@ function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
   return `Bearer ${token}`
 }
 
+
+console.log(makeAuthHeader({id: 1,
+  username: 'admin',
+  name: 'Dunder Mifflin Admin',
+  password: 'pass'}, 'spaced-repetition-jwt-secret'));
+
 /**
  * remove data from tables and reset sequences for SERIAL id fields
  * @param {knex instance} db
