@@ -65,6 +65,7 @@ languageRouter
     totalScore: head.value.total_score
   })
 })
+
 languageRouter
   .post('/guess', async (req, res, next) => {
     // implement me

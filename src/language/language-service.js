@@ -30,6 +30,7 @@ const LanguageService = {
       )
       .where({ language_id });
   },
+
   getLanguageWordsTwo(db, language_id){
     return db
       .from('word')
@@ -42,16 +43,7 @@ const LanguageService = {
       )
       .where({ language_id });
   },
-  getWordsLinkedList(words){
-    let list = new LinkedList();
-    list.insertFirst(words[0]);
-    let i = words.length-1;
-    while(i > 0){
-      list.insertLast(words[i]);
-      i--;
-    }
-    return list;
-  },
+  
   getLanguageHead(words){
     let list = new LinkedList();
     list.insertFirst(words[0]);
