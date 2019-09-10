@@ -77,27 +77,30 @@ languageRouter
     if(!guess){
       return res.status(400).json({error:"Missing 'guess' in request body"})
     } 
-    const words = await LanguageService.getLanguageWords(req.app.get('db'), req.language.id)
-    const answer = await LanguageService.getAnswer(guess, req.app.get('db'), req.language.id)
-    console.log(words)
-    words.sort(function(a,b){
-      words[a].memory_value - words[b].memory_value;
-    })
-    console.log(words)
-   /*  if(answer === []){
+    let words = await LanguageService.getLanguageWords(req.app.get('db'), req.language.id)
+    let answer = await LanguageService.getAnswer(guess, req.app.get('db'), req.language.id)
+    
+    if(answer === []){
       //do something
     }
     else {
-
-      answer.memory_value = answer.memory_value *2 
+       answer = answer[0]
+       
+      answer.memory_value = (answer.memory_value)*2 
 //set answer's pointer o x2 places down --change prev to point to answer
 //set head to answer's next pointer
 let newHead = words[1]
-answer.next = words[answer.memory_value]
-words[answer.memory_value].next = answer
+let insertAfter = {}
+//need to find the spot for the answer to go into--m spots away
+for(let i =0; i < answer.memory_value; i++){
+  insertAfter = words[i]
+}
+let answerNext = insertAfter.next;
+insertAfter.next = answer;
+answer.next = answerNext
 newHead.next = words[2]
-      LanguageService.rightAnswer(answer, words)
-    } */
+      LanguageService.rightAnswer(answer, newHead, )
+    }
     console.log(answer)
     res.status(200).json({answer})
   }
