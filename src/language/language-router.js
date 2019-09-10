@@ -56,7 +56,8 @@ languageRouter
       next(error)
     }
   })
-.get(jsonBodyParser, (req, res, next)=>{
+  
+/* .get(jsonBodyParser, (req, res, next)=>{
   const head = LanguageService.getLanguageHead(res.words)
   return res.json({
     nextWord: head.value.original,
@@ -64,12 +65,23 @@ languageRouter
     wordIncorrectCount: head.value.incorrect_count,
     totalScore: head.value.total_score
   })
-})
+}) */
 
 languageRouter
-  .post('/guess', async (req, res, next) => {
-    // implement me
-    res.send('implement me!')
-  })
+  .post('/guess', jsonBodyParser, async(req, res, next) => {
+    try {
+      const {guess, original} = req.body
+    console.log(guess, original)
+    if(!guess){
+      return res.status(400).json({error:"Missing 'guess' in request body"})
+    } 
+    const answer = LanguageService.checkAnswer(guess, original, req.app.get('db'), req.language.id)
+    console.log(answer)
+    res.status(200).json({answer})
+  }
+  catch(error){
+    next(error)
+  }
+})
 
 module.exports = languageRouter

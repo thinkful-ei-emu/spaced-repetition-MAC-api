@@ -53,6 +53,22 @@ const LanguageService = {
       i--;
     }
     return list.head;
+  },
+  checkAnswer(guess, original, db, language_id){
+    return db
+    .from('word')
+    .join('language, word.language_id', 'language.id')
+    .select(
+      'language.total_score',
+      'word.correct_count',
+      'word.incorrect_count',
+      'word.translation',
+      'word.original'
+    )
+    .where({language_id})
+   // .andWhere('word.original', original)
+
+    
   }
 };
 
