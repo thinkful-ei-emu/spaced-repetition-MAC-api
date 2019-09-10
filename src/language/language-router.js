@@ -58,8 +58,16 @@ languageRouter
     }
   })
 .get(jsonBodyParser, (req, res, next)=>{
-    console.log(res.head)
+  try{
+    if (!res.head[0])
+    return res.status(404).json({
+      error: `Cannot find word`,
+    })
     return res.json(res.head[0])
+  } 
+  catch (error) {
+    next(error) 
+  }  
 
 })
 
