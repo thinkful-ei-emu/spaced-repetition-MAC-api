@@ -110,10 +110,10 @@ describe.only('Language Endpoints', function () {
   /**
    * @description Get head from language
    **/
-  describe(`GET /api/language/head`, () => {
+  describe.only(`GET /api/language/head`, () => {
     const usersLanguage = testLanguages.find(l => l.user_id === testUser.id)
     const headWord = testWords.find(w => w.language_id === usersLanguage.id)
-
+    context(`Given words`, () => {
     beforeEach('insert users, languages and words', () => {
       return helpers.seedUsersLanguagesWords(
         db,
@@ -135,6 +135,7 @@ describe.only('Language Endpoints', function () {
           wordIncorrectCount: 0,
         })
     })
+    })    
   })
 
   /**

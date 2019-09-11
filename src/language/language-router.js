@@ -39,7 +39,7 @@ languageRouter.get("/", async (req, res, next) => {
   }
 });
 
-languageRouter.all("/head", async (req, res, next) => {
+/* languageRouter.all("/head", async (req, res, next) => {
   try {
     const head = await LanguageService.getLanguageHead(
       req.app.get("db"),
@@ -52,7 +52,7 @@ languageRouter.all("/head", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-});
+}); */
 
 /* .get(jsonBodyParser, (req, res, next)=>{
   const head = LanguageService.getLanguageHead(res.words)
@@ -162,6 +162,35 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+});
+
+languageRouter
+  .all('/head', async (req, res, next) => {
+    try {      
+      const head = await LanguageService.getLanguageHead(
+        req.app.get('db'),
+        req.language.id,
+      )
+      res.head = head
+     
+      next()
+    } 
+   catch (error) {
+      next(error)
+    }
+  })
+.get(jsonBodyParser, (req, res, next)=>{
+  try{
+    if (!res.head[0])
+    return res.status(404).json({
+      error: `Cannot find word`,
+    })
+    return res.json(res.head[0])
+  } 
+  catch (error) {
+    next(error) 
+  }  
+
 });
 
 module.exports = languageRouter;

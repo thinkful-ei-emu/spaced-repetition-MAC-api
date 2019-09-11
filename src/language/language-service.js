@@ -124,7 +124,18 @@ const LanguageService = {
    )
    .where({'word.translation': guess, 'language.id':language_id})
    }, */
-
+  getLanguageHead(db, language_id) {
+    return db
+      .from('word')
+      .join('language', 'word.language_id', 'language.id')
+      .select(
+        'word.original AS nextWord',
+        'language.total_score AS totalScore',  
+        'word.correct_count AS wordCorrectCount',
+        'word.incorrect_count AS wordIncorrectCount'          
+        
+      ).where({ language_id });    
+      },
   //if head value equals user's guess:
   rightAnswer(newHead, correctlyAnswered, insertAfter, db, language_id) {
     console.log("RIGHT ANSWER IS RUNNING");
