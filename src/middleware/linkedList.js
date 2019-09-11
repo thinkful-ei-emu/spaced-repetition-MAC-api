@@ -76,15 +76,21 @@ class LinkedList {
   }  
 
   find(item){
+    console.log('ITEM',item)
     let currNode = this.head;
+    console.log("HEAD CURRENT NODE",currNode)
+
     if(!this.head){
+
       return null; 
     }
-    while(currNode.value !==item){
+    while(currNode.value.translation !== item){
       if(currNode.next === null){
         return null;
       }
       else{
+        console.log("CURRENT NODE",currNode)
+
         currNode = currNode.next;
       }
     }
