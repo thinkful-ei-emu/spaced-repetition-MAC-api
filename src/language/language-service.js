@@ -1,87 +1,99 @@
-const LinkedList = require('../middleware/linkedList');
+const LinkedList = require("../middleware/linkedList");
 
 const LanguageService = {
   getUsersLanguage(db, user_id) {
     return db
-      .from('language')
+      .from("language")
       .select(
-        'language.id',
-        'language.name',
-        'language.user_id',
-        'language.head',
-        'language.total_score'
+        "language.id",
+        "language.name",
+        "language.user_id",
+        "language.head",
+        "language.total_score"
       )
-      .where('language.user_id', user_id)
+      .where("language.user_id", user_id)
       .first();
   },
 
   getLanguageWords(db, language_id) {
     return db
-      .from('word')
+      .from("word")
       .select(
-        'id',
-        'language_id',
-        'original',
-        'translation',
-        'next',
-        'memory_value',
-        'correct_count',
-        'incorrect_count'
+        "id",
+        "language_id",
+        "original",
+        "translation",
+        "next",
+        "memory_value",
+        "correct_count",
+        "incorrect_count"
       )
       .where({ language_id });
   },
 
   getAnswer(db, language_head) {
     return db
-      .from('word')
-      .join('language', 'word.id', 'language.head')
+      .from("word")
+      .join("language", "word.id", "language.head")
       .select(
-        'word.id',
-        'word.original',
-        'word.translation',
-        'word.next',
-        'language.total_score',
-        'word.correct_count',
-        'word.incorrect_count',
-        'word.memory_value'
+        "word.id",
+        "word.original",
+        "word.translation",
+        "word.next",
+        "language.total_score",
+        "word.correct_count",
+        "word.incorrect_count",
+        "word.memory_value"
       );
-
   },
-  async wrongAnswer(newHead,
+  async wrongAnswer(
+    newHead,
     incorrectlyAnswered,
     placeholder,
     db,
-    language_id){
- let output = await this.updateHead(newHead, db, language_id)
- console.log('HEAD UPDATED', output)
- output = await this.updateIncorrectlyAnswered(incorrectlyAnswered, db, language_id)
- output = await this.updatePlaceholder(placeholder, db, language_id)
-return output
+    language_id
+  ) {
+    let output = await this.updateHead(newHead, db, language_id);
+    console.log("HEAD UPDATED", output);
+    output = await this.updateIncorrectlyAnswered(
+      incorrectlyAnswered,
+      db,
+      language_id
+    );
+    output = await this.updatePlaceholder(placeholder, db, language_id);
+    return output;
   },
-  updateHead(newHead, db, language_id){
+  updateHead(newHead, db, language_id) {
     return db
-    .from('language')
-    .where('id', language_id)
-    .update('head', newHead[0].id)
+      .from("language")
+      .where("id", language_id)
+      .update("head", newHead[0].id);
   },
-  updateIncorrectlyAnswered(incorrect, db, language_id){
+  updateIncorrectlyAnswered(incorrect, db, language_id) {
+    return db.raw(
+      `UPDATE word SET incorrect_count = ${incorrect.incorrect_count}, memory_value = ${incorrect.memory_value}, next = ${incorrect.next} FROM language WHERE word.language_id = language.id AND language.id = ${language_id} AND word.id = ${incorrect.id}`
+    );
+    /* 
     return db
     .from('word')
     .join('language', 'language.id', 'word.language_id')
     .where({'language.id': language_id, 'word.id': incorrect.id})
     .update({'word.incorrect_count': incorrect.incorrect_count, 'word.memory_value': incorrect.memory_value, 'word.next': incorrect.next})
-
+  */
   },
-  updatePlaceholder(placeholder, db, language_id){
-    return db
-    .from('word')
-    .join('language', 'word.language_id', 'language.id')
-    .where({'language.id': language_id, 'word.id': placeholder.id})
-    .update({'word.next': placeholder.next})
-
+  updatePlaceholder(placeholder, db, language_id) {
+    console.log('PLACEHOLDER', placeholder)
+    return db.raw(
+      `UPDATE word SET next = ${placeholder.next} FROM language WHERE word.language_id = language.id AND language.id = ${language_id} AND word.id = ${placeholder.id}`
+    )
+    /* return db
+      .from("word")
+      .join("language", "word.language_id", "language.id")
+      .where({ "language.id": language_id, "word.id": placeholder.id })
+      .update({ "word.next": placeholder.next }); */
   },
 
-/*  
+  /*  
        LanguageService.wrongAnswer(
         newHead,
         incorrectlyAnswered,
@@ -97,7 +109,7 @@ return output
     console.log('LIST', list)
     return list
   }, */
- /*  getAnswer(guess, db, language_id){
+  /*  getAnswer(guess, db, language_id){
    return db
    .from('word')
    .join('language', 'word.id', 'word.language_id')
@@ -112,28 +124,28 @@ return output
    )
    .where({'word.translation': guess, 'language.id':language_id})
    }, */
-  
-   //if head value equals user's guess:
-   rightAnswer(newHead,
-    correctlyAnswered,
-    insertAfter,
-    db,
-    language_id){
-      console.log('RIGHT ANSWER IS RUNNING')
-      this.updateHead(newHead, db, language_id)
-      this.updatePlaceholder(insertAfter, db, language_id)
-      this.updateCorrectlyAnswered(correctlyAnswered, db, language_id)
-      return 'updated'
-   },
-   updateCorrectlyAnswered(correct, db, language_id){
-    return db
-    .from('word')
-    .join('language', 'word.language_id', 'language.id')
-    .where({'language.id': language_id, 'word.id': correct.id})
-    .update({'word.correct_count': correct.correct_count, 'word.memory_value': correct.memory_value, 'word.next': correct.next, 'language.total_score': correct.total_score})
 
-   }
-   /*  
+  //if head value equals user's guess:
+  rightAnswer(newHead, correctlyAnswered, insertAfter, db, language_id) {
+    console.log("RIGHT ANSWER IS RUNNING");
+    this.updateHead(newHead, db, language_id);
+    this.updatePlaceholder(insertAfter, db, language_id);
+    this.updateCorrectlyAnswered(correctlyAnswered, db, language_id);
+    return "updated";
+  },
+  updateCorrectlyAnswered(correct, db, language_id) {
+    return db
+      .from("word")
+      .join("language", "word.language_id", "language.id")
+      .where({ "language.id": language_id, "word.id": correct.id })
+      .update({
+        "word.correct_count": correct.correct_count,
+        "word.memory_value": correct.memory_value,
+        "word.next": correct.next,
+        "language.total_score": correct.total_score
+      });
+  }
+  /*  
 Set the word's new memory value as appropriate according to the algorithm.
 Update the incorrect count or correct count for that word.
 Update the total score if appropriate.
@@ -143,14 +155,14 @@ Send a response with the fields for feedback about the user's guess as well as t
 /spaced-repetition/cypress/fixtures/language-guess-correct.json
 /spaced-repetition/cypress/fixtures/language-guess-incorrect.json
 Once you've completed the steps, the integration test should pass. */
-      //store head value and update memory value
-      //UPDATE word SET memory_value = 1 FROM language WHERE language.id = word.language_id AND word.translation ILIKE '%coffee%';
+  //store head value and update memory value
+  //UPDATE word SET memory_value = 1 FROM language WHERE language.id = word.language_id AND word.translation ILIKE '%coffee%';
 
-      //SELECT language.head, word.translation FROM language JOIN word on language.id = word.language_id WHERE word.id = language.head;
+  //SELECT language.head, word.translation FROM language JOIN word on language.id = word.language_id WHERE word.id = language.head;
 
-      //UPDATE language SET head = word.next FROM word WHERE language.id = word.language_id AND word.id = language.id;
+  //UPDATE language SET head = word.next FROM word WHERE language.id = word.language_id AND word.id = language.id;
 
-      /* correctAnswer.memory_value = correctAnswer.memory_value *2 
+  /* correctAnswer.memory_value = correctAnswer.memory_value *2 
       console.log('MEMORY VALUE', correctAnswer.memory_value)
       //reset head
       list.head = list.head.next
@@ -159,7 +171,7 @@ Once you've completed the steps, the integration test should pass. */
       console.log('AFTER CORRECT', list)
       //return correctAnswer
  */
-    /*   return db 
+  /*   return db 
       .from('word')
       .join('')
 
@@ -173,8 +185,6 @@ Once you've completed the steps, the integration test should pass. */
       list.insertAt(incorrectAnswer, incorrectAnswer.memory_value)
       console.log('AFTER INCORRECT', list)
    return correctAnswer */
-    
-  
 };
 
 module.exports = LanguageService;

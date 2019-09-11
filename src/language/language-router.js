@@ -118,7 +118,7 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
       //set answer's pointer o x2 places down --change prev to point to answer
       //set head to answer's next pointer
       let newHead = words.filter(word => word.id === answer.next);
-      let insertAfter = {};
+      let insertAfter;
       //need to find the spot for the answer to go into--m spots away
       if (answer.memory_value > words.length) {
         let i = 0;
@@ -128,7 +128,6 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
         }
         insertAfter.next = answer;
         answer.next = null;
-        answer.memory_value = words.length - 1;
       } else {
         for (let i = 0; i < answer.memory_value + 1; i++) {
           insertAfter = words[i];
