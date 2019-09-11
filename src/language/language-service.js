@@ -38,9 +38,12 @@ const LanguageService = {
       .select(
         'word.id',
         'word.original',
+        'word.translation',
+        'word.next',
         'language.total_score',
         'word.correct_count',
-        'word.incorrect_count'
+        'word.incorrect_count',
+        'word.memory_value'
       );
 
   },
@@ -54,7 +57,7 @@ const LanguageService = {
     console.log('LIST', list)
     return list
   }, */
-  getAnswer(guess, db, language_id){
+ /*  getAnswer(guess, db, language_id){
    return db
    .from('word')
    .join('language', 'word.id', 'word.language_id')
@@ -68,7 +71,7 @@ const LanguageService = {
      'word.memory_value'
    )
    .where({'word.translation': guess, 'language.id':language_id})
-   },
+   }, */
   
    //if head value equals user's guess:
    rightAnswer(){

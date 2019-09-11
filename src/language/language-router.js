@@ -78,15 +78,45 @@ languageRouter
       return res.status(400).json({error:"Missing 'guess' in request body"})
     } 
     let words = await LanguageService.getLanguageWords(req.app.get('db'), req.language.id)
-    let answer = await LanguageService.getAnswer(guess, req.app.get('db'), req.language.id)
-    
-    if(answer === []){
-      //do something
+    let answer = await LanguageService.getLanguageHead(req.app.get('db'), req.language.id)
+    answer = answer[0]
+    let response = {}
+    if(answer.translation !== guess){
+      //do {
+/*   "nextWord": "test-next-word-from-incorrect-guess",
+  "wordCorrectCount": 888,
+  "wordIncorrectCount": 111,
+  "totalScore": 999,
+  "answer": "test-answer-from-incorrect-guess",
+  "isCorrect": false
+} */
+  response = {
+    nextWord: words[1].original,
+    wordCorrectCount: answer.correct_count,
+    wordIncorrectCount: answer.incorrect_count + 1,
+    totalScore: answer.totalScore,
+    answer: answer.translation,
+    isCorrect: false
+  }
+  answer.memory_value = 1;
+  answer.incorrect_count = answer.incorrect_count + 1;
+  let newHead = words[1];
+  let incorrectlyAnswered = answer
+  let insertAfter = {}
+  for(let i=0; i <=answer.memory_value; i++){
+    insertAfter = words[i]
+  }
+  let answerNext=insertAfter.next;
+  insertAfter.next = incorrectlyAnswered;
+  incorrectlyAnswered.next = answerNext
+  newHead.next = words[2]
+  LanguageService.wrongAnswer(newHead, req.app.get('db'), req.language.id)
     }
     else {
-       answer = answer[0]
-       
-      answer.memory_value = (answer.memory_value)*2 
+    
+      answer.memory_value = (answer.memory_value)*2
+      answer.totalScore = answer.totalScore +1
+      answer.correct_count = answer.correct_count +1
 //set answer's pointer o x2 places down --change prev to point to answer
 //set head to answer's next pointer
 let newHead = words[1]
@@ -99,9 +129,9 @@ let answerNext = insertAfter.next;
 insertAfter.next = answer;
 answer.next = answerNext
 newHead.next = words[2]
-      LanguageService.rightAnswer(answer, newHead, )
+      LanguageService.rightAnswer(answer, newHead, insertAfter, req.app.get('db'), req.language.id)
     }
-    console.log(answer)
+    console.log(answer[0])
     res.status(200).json({answer})
   }
   catch(error){
