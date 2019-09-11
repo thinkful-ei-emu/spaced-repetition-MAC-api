@@ -31,7 +31,7 @@ const LanguageService = {
       .where({ language_id });
   },
 
-  getLanguageHead(db, language_head) {
+  getAnswer(db, language_head) {
     return db
       .from('word')
       .join('language', 'word.id', 'language.head')
@@ -47,8 +47,48 @@ const LanguageService = {
       );
 
   },
+  wrongAnswer(newHead,
+    incorrectlyAnswered,
+    placeholder,
+    db,
+    language_id){
 
-/*   populateLinkedList(words){
+this.updateHead(newHead, db, language_id)
+this.updateIncorrectlyAnswered(incorrectlyAnswered, db, language_id)
+this.updatePlaceholder(placeholder, db, language_id)
+return 'updated'
+  },
+  updateHead(newHead, db, language_id){
+    return db
+    .from('language')
+    .where({language_id})
+    .update('language.head', newHead[0].id)
+  },
+  updateIncorrectlyAnswered(incorrect, db, language_id){
+    return db
+    .from('word')
+    .join('language', 'word.language_id', 'language.id')
+    .where({'language.id': language_id, 'word.id': incorrect.id})
+    .update({'word.incorrect_count': incorrect.incorrect_count, 'word.memory_value': incorrect.memory_value, 'word.next': incorrect.next})
+
+  },
+  updatePlaceholder(placeholder, db, language_id){
+    return db
+    .from('word')
+    .join('language', 'word.language_id', 'language.id')
+    .where({'language.id': language_id, 'word.id': placeholder.id})
+    .update({'word.next': placeholder.next})
+
+  },
+
+/*  
+       LanguageService.wrongAnswer(
+        newHead,
+        incorrectlyAnswered,
+        placeholder,
+        req.app.get("db"),
+        req.language.id
+      ); populateLinkedList(words){
     let list = new LinkedList()
     list.insertFirst(words[0])
     for(let i =1; i < words.length-1; i++){
@@ -74,7 +114,22 @@ const LanguageService = {
    }, */
   
    //if head value equals user's guess:
-   rightAnswer(){
+   rightAnswer(newHead,
+    correctlyAnswered,
+    insertAfter,
+    db,
+    language_id){
+      this.updateHead(newHead, db, language_id)
+      this.updatePlaceholder(insertAfter, db, language_id)
+      this.updateCorrectlyAnswered(correctlyAnswered, db, language_id)
+      return 'updated'
+   },
+   updateCorrectlyAnswered(correct, db, language_id){
+    return db
+    .from('word')
+    .join('language', 'word.language_id', 'language.id')
+    .where({'language.id': language_id, 'word.id': correct.id})
+    .update({'word.correct_count': correct.correct_count, 'word.memory_value': correct.memory_value, 'word.next': correct.next, 'language.total_score': correct.total_score})
 
    }
    /*  

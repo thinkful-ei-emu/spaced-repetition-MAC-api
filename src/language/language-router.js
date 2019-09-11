@@ -75,21 +75,16 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
       req.app.get("db"),
       req.language.id
     );
-    let answer = await LanguageService.getLanguageHead(
+    let answer = await LanguageService.getAnswer(
       req.app.get("db"),
       req.language.id
     );
     answer = answer[0];
+    console.log(answer);
+    console.log(words);
     let response = {};
     if (answer.translation != guess) {
-      //do {
-      /*   "nextWord": "test-next-word-from-incorrect-guess",
-  "wordCorrectCount": 888,
-  "wordIncorrectCount": 111,
-  "totalScore": 999,
-  "answer": "test-answer-from-incorrect-guess",
-  "isCorrect": false
-} */
+      //formatting response
       response = {
         nextWord: words[1].original,
         wordCorrectCount: answer.correct_count,
@@ -101,58 +96,70 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
       //if answer incorrect: reset memory value to 1, move back 1 spot in list//to second--basically swap
       answer.memory_value = 1;
       answer.incorrect_count = answer.incorrect_count + 1;
-      let newHead = words[answer.next];
+      let newHead = words.filter(word => word.id === answer.next);
       let incorrectlyAnswered = answer;
-      let placeholder = newHead.next;
-      newHead.next = incorrectlyAnswered;
+      let placeholder = newHead[0].next;
+      newHead[0].next = incorrectlyAnswered.id;
       incorrectlyAnswered.next = placeholder;
-      console.log('INCORRECT ANSWER', incorrectlyAnswered)
-      console.log('NEW HEAD', newHead)
-      
-    /*   LanguageService.wrongAnswer(
+      console.log("INCORRECT ANSWER", incorrectlyAnswered);
+      console.log("NEW HEAD", newHead);
+
+      LanguageService.wrongAnswer(
         newHead,
         incorrectlyAnswered,
-        insertAfter,
+        placeholder,
         req.app.get("db"),
         req.language.id
-      ); */
+      );
     } else {
       answer.memory_value = answer.memory_value * 2;
-      answer.totalScore = answer.total_score + 1;
+      answer.total_score = answer.total_score + 1;
       answer.correct_count = answer.correct_count + 1;
       //set answer's pointer o x2 places down --change prev to point to answer
       //set head to answer's next pointer
-      let newHead = words[1];
+      let newHead = words.filter(word => word.id === answer.next);
       let insertAfter = {};
       //need to find the spot for the answer to go into--m spots away
-      if(answer.memory_value > words.length){
-        insertAfter = words[words.length-1]
+      if (answer.memory_value > words.length) {
+        let i = 0;
+        while (words[i].next !== null) {
+          insertAfter = words[i];
+          i++;
+        }
         insertAfter.next = answer;
         answer.next = null;
-      } 
-      else {
-      for (let i = 0; i < answer.memory_value; i++) {
-        insertAfter = words[i];
+        answer.memory_value = words.length - 1;
+      } else {
+        for (let i = 0; i < answer.memory_value + 1; i++) {
+          insertAfter = words[i];
+        }
+        let answerNext = insertAfter.next;
+        // newHead[0].next = answer.next;
+        insertAfter.next = answer.id;
+        answer.next = answerNext;
       }
-      let answerNext = insertAfter.next;
-      insertAfter.next = answer;
-      answer.next = answerNext;
-      newHead.next = words[2];
-    }
-      console.log('INSERT AFTER LOOP', insertAfter)
-      
-      console.log('CORRECT ANSWER', answer)
-      console.log('NEW HEAD', newHead)
-      console.log("INSERT AFTER", insertAfter)
-     /*  LanguageService.rightAnswer(
+      console.log("INSERT AFTER LOOP", insertAfter);
+      console.log("CORRECT ANSWER", answer);
+      console.log("NEW HEAD", newHead);
+      console.log("INSERT AFTER", insertAfter);
+       LanguageService.rightAnswer(
         newHead,
         answer,
         insertAfter,
         req.app.get("db"),
         req.language.id
-      ); */
+      );
+
+      response = {
+        nextWord: newHead.original,
+        wordCorrectCount: answer.correct_count,
+        wordIncorrectCount: answer.incorrect_count,
+        totalScore: answer.total_score,
+        answer: answer.translation,
+        isCorrect: true
+      };
     }
-    res.status(200).json({ answer });
+    res.status(200).json({ response });
   } catch (error) {
     next(error);
   }
