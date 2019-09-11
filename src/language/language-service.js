@@ -34,7 +34,7 @@ const LanguageService = {
   getLanguageHead(db, language_id) {
     return db
       .from('word')
-      .join('language', 'word.id', 'language.id')
+      .join('language', 'word.language_id', 'language.id')
       .select(
         'word.original AS nextWord',
         'language.total_score AS totalScore',  
