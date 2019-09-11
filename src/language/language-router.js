@@ -98,6 +98,7 @@ languageRouter
     answer: answer.translation,
     isCorrect: false
   }
+  //if answer incorrect: reset memory value to 1, move back 1 spot in list//to second--basically swap
   answer.memory_value = 1;
   answer.incorrect_count = answer.incorrect_count + 1;
   let newHead = words[1];
@@ -110,7 +111,7 @@ languageRouter
   insertAfter.next = incorrectlyAnswered;
   incorrectlyAnswered.next = answerNext
   newHead.next = words[2]
-  LanguageService.wrongAnswer(newHead, req.app.get('db'), req.language.id)
+  LanguageService.wrongAnswer(newHead, incorrectlyAnswered, insertAfter, req.app.get('db'), req.language.id)
     }
     else {
     
@@ -129,7 +130,7 @@ let answerNext = insertAfter.next;
 insertAfter.next = answer;
 answer.next = answerNext
 newHead.next = words[2]
-      LanguageService.rightAnswer(answer, newHead, insertAfter, req.app.get('db'), req.language.id)
+      LanguageService.rightAnswer(newHead, answer, insertAfter, req.app.get('db'), req.language.id)
     }
     console.log(answer[0])
     res.status(200).json({answer})
