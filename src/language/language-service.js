@@ -47,27 +47,27 @@ const LanguageService = {
       );
 
   },
-  wrongAnswer(newHead,
+  async wrongAnswer(newHead,
     incorrectlyAnswered,
     placeholder,
     db,
     language_id){
-
-this.updateHead(newHead, db, language_id)
-this.updateIncorrectlyAnswered(incorrectlyAnswered, db, language_id)
-this.updatePlaceholder(placeholder, db, language_id)
-return 'updated'
+ let output = await this.updateHead(newHead, db, language_id)
+ console.log('HEAD UPDATED', output)
+ output = await this.updateIncorrectlyAnswered(incorrectlyAnswered, db, language_id)
+ output = await this.updatePlaceholder(placeholder, db, language_id)
+return output
   },
   updateHead(newHead, db, language_id){
     return db
     .from('language')
-    .where({language_id})
-    .update('language.head', newHead[0].id)
+    .where('id', language_id)
+    .update('head', newHead[0].id)
   },
   updateIncorrectlyAnswered(incorrect, db, language_id){
     return db
     .from('word')
-    .join('language', 'word.language_id', 'language.id')
+    .join('language', 'language.id', 'word.language_id')
     .where({'language.id': language_id, 'word.id': incorrect.id})
     .update({'word.incorrect_count': incorrect.incorrect_count, 'word.memory_value': incorrect.memory_value, 'word.next': incorrect.next})
 
@@ -119,6 +119,7 @@ return 'updated'
     insertAfter,
     db,
     language_id){
+      console.log('RIGHT ANSWER IS RUNNING')
       this.updateHead(newHead, db, language_id)
       this.updatePlaceholder(insertAfter, db, language_id)
       this.updateCorrectlyAnswered(correctlyAnswered, db, language_id)

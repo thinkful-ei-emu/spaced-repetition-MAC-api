@@ -104,7 +104,7 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
       console.log("INCORRECT ANSWER", incorrectlyAnswered);
       console.log("NEW HEAD", newHead);
 
-      LanguageService.wrongAnswer(
+      await LanguageService.wrongAnswer(
         newHead,
         incorrectlyAnswered,
         placeholder,
@@ -142,7 +142,7 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
       console.log("CORRECT ANSWER", answer);
       console.log("NEW HEAD", newHead);
       console.log("INSERT AFTER", insertAfter);
-       LanguageService.rightAnswer(
+       await LanguageService.rightAnswer(
         newHead,
         answer,
         insertAfter,
