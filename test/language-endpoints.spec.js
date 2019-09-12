@@ -110,7 +110,7 @@ describe.only('Language Endpoints', function () {
   /**
    * @description Get head from language
    **/
-  describe.only(`GET /api/language/head`, () => {
+  describe(`GET /api/language/head`, () => {
     const usersLanguage = testLanguages.find(l => l.user_id === testUser.id)
     const headWord = testWords.find(w => w.language_id === usersLanguage.id)
     context(`Given words`, () => {
@@ -141,7 +141,7 @@ describe.only('Language Endpoints', function () {
   /**
    * @description Submit a new guess for the language
    **/
-  describe.only(`POST /api/language/guess`, () => {
+  describe(`POST /api/language/guess`, () => {
     const [testLanguage] = testLanguages
     const testLanguagesWords = testWords.filter(
       w => w.language_id === testLanguage.id
@@ -191,7 +191,7 @@ describe.only('Language Endpoints', function () {
           })
       })
 
-      it.skip(`moves the word 1 space and updates incorrect count`, async () => {
+      it(`moves the word 1 space and updates incorrect count`, async () => {
         await supertest(app)
           .post(`/api/language/guess`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
@@ -217,7 +217,7 @@ describe.only('Language Endpoints', function () {
         word => word.language_id === testLanguage.id
       )
 
-      it.skip(`responds with correct and moves head`, () => {
+      it(`responds with correct and moves head`, () => {
         const correctPostBody = {
           guess: testLanguagesWords[0].translation,
         }
@@ -236,7 +236,7 @@ describe.only('Language Endpoints', function () {
           })
       })
 
-      it.skip(`moves the word 2 spaces, increases score and correct count`, async () => {
+      it(`moves the word 2 spaces, increases score and correct count`, async () => {
         let correctPostBody = {
           guess: testLanguagesWords[0].translation,
         }

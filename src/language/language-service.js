@@ -1,4 +1,4 @@
-const LinkedList = require("../middleware/linkedList");
+
 
 const LanguageService = {
   getUsersLanguage(db, user_id) {
@@ -88,22 +88,20 @@ const LanguageService = {
     db,
     language_id
   ) {
-    console.log('FROM WRONG NASWER',placeholder, incorrectlyAnswered)
     await this.updateIncorrectlyAnswered(incorrectlyAnswered, db, language_id);
-    console.log('!update')
     await this.updatePlaceholder(
       placeholder,
       db,
       language_id,
       incorrectlyAnswered
     );
-    console.log('!update2')
+    
 
     await this.updateHeadWord(newHead, db, language_id);
-    console.log('!update3')
+    
 
     await this.updateHead(newHead, db, language_id);
-    console.log('!update4')
+    
 
     return "update head complete";
   },
@@ -123,7 +121,6 @@ const LanguageService = {
     // return db.raw(
     //   `UPDATE word SET incorrect_count = ${incorrect.incorrect_count}, memory_value = ${incorrect.memory_value}, next = ${incorrect.next} FROM language WHERE word.language_id = language.id AND language.id = ${language_id} AND word.id = ${incorrect.id}`
     // );
-    console.log('INCORECT UPDATE')
     return db
       .from("word")
       .where({ language_id: language_id, id: incorrect.id })
@@ -137,7 +134,6 @@ const LanguageService = {
     // return db.raw(
     //   `UPDATE word SET next = ${placeholder.next} FROM language WHERE word.language_id = language.id AND language.id = ${language_id} AND word.id = ${placeholder.id}`
     // )    console.log('INCORECT UPDATE')
-    console.log('INCORECT PLACEHOLDER UPDATE')
 
     return db
       .from("word")
@@ -178,15 +174,15 @@ const LanguageService = {
    }, */
   getLanguageHead(db, language_id) {
     return db
-      .from("word")
-      .join("language", "word.language_id", "language.id")
+      .from("language")
+      .join("word", "word.id", "language.head")
       .select(
         "word.original AS nextWord",
         "language.total_score AS totalScore",
         "word.correct_count AS wordCorrectCount",
         "word.incorrect_count AS wordIncorrectCount"
       )
-      .where({ language_id });
+      .where("language.id", language_id)
   },
   //if head value equals user's guess:
   async rightAnswer(newHead, correctlyAnswered, insertAfter, db, language_id) {
@@ -203,7 +199,6 @@ const LanguageService = {
     return "updated";
   },
   updateCorrectlyAnswered(correct, db, language_id) {
-    console.log("UPDATE CORRECT", correct);
     return db
       .from("word")
       .where({ "language_id": language_id, "id": correct.id })
