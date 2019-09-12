@@ -42,6 +42,7 @@ languageRouter.get("/", async (req, res, next) => {
 languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
   try {
     const { guess } = req.body;
+    console.log(req.body)
     if (!guess) {
       return res.status(400).json({ error: "Missing 'guess' in request body" });
     }
@@ -50,10 +51,11 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
       req.app.get("db"),
       req.language.id,
     );
+    console.log(answer)
     answer = answer[0];
 
     let nextWord = await LanguageService.getNextWord(req.app.get("db"), req.language.id, answer.next)
-    
+    console.log(nextWord)
     let response = {};
     if (answer.translation != guess) {
       //formatting response
@@ -93,15 +95,21 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
       let insertAfter;
       //need to find the spot for the answer to go into--m spots away
       if (answer.memory_value > 10) { //based number of words in list
-        insertAfter = await LanguageService.getLastWord(req.app.get('db', req.language.id))
-        insertAfter[0].next = answer.id;
+        console.log('in greater than 10 running')
         answer.next = null;
+        insertAfter = await LanguageService.getLastWord(req.app.get('db'), req.language.id);  
+        console.log('in greater before index', insertAfter);  
+        insertAfter[0].next = answer.id;
+        console.log('in greater than 10', insertAfter);
+        // answer.next = null;
       } else {
         let placeholderNext = answer.next;
         for (let i = 0; i < answer.memory_value; i++) {
           insertAfter= await LanguageService.getNextWord(req.app.get("db"), req.language.id, placeholderNext);
+         
           placeholderNext = insertAfter[0].next;
         }
+        console.log(insertAfter)
         insertAfter[0].next = answer.id;
         answer.next = placeholderNext;
       }

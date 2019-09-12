@@ -1,5 +1,3 @@
-
-
 const LanguageService = {
   getUsersLanguage(db, user_id) {
     return db
@@ -48,7 +46,8 @@ const LanguageService = {
         "incorrect_count",
         "memory_value"
       )
-      .where({ next: null, language_id: language_id });
+      .whereNull("next")
+      .andWhere({language_id});
   },
 
   getNextWord(db, language_id, id) {
@@ -94,8 +93,7 @@ const LanguageService = {
       db,
       language_id,
       incorrectlyAnswered
-    );    
-
+    );
     await this.updateHeadWord(newHead, db, language_id);
     await this.updateHead(newHead, db, language_id); 
     return "update head complete";
