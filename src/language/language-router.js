@@ -94,6 +94,7 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
       let newHead = nextWord[0]; //newhead
       let insertAfter;
       //need to find the spot for the answer to go into--m spots away
+      console.log('memory val num:', answer.memory_value)
       if (answer.memory_value > 10) { //based number of words in list
         console.log('in greater than 10 running')
         answer.next = null;
@@ -104,12 +105,16 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
         // answer.next = null;
       } else {
         let placeholderNext = answer.next;
-        for (let i = 0; i < answer.memory_value; i++) {
-          insertAfter= await LanguageService.getNextWord(req.app.get("db"), req.language.id, placeholderNext);
-         
-          placeholderNext = insertAfter[0].next;
-        }
-        console.log(insertAfter)
+        
+        for (let i = 0; i < answer.memory_value; i++) {        
+          if(placeholderNext === null){           
+            insertAfter = await LanguageService.getLastWord(req.app.get('db'), req.language.id);  
+          }
+          else{
+            insertAfter= await LanguageService.getNextWord(req.app.get("db"), req.language.id, placeholderNext);
+            placeholderNext = insertAfter[0].next;
+          }
+        }      
         insertAfter[0].next = answer.id;
         answer.next = placeholderNext;
       }
