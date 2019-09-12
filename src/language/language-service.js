@@ -30,7 +30,11 @@ const LanguageService = {
       )
       .where({ language_id });
   },
-
+  // getTotalWords(db) { //inplement count for loop
+  //   return db
+  //     .from("word")
+  //     .count()
+  // },
 
   getLastWord(db, language_id) {
     return db
@@ -177,25 +181,35 @@ const LanguageService = {
       ).where({ language_id });
   },
   //if head value equals user's guess:
-  rightAnswer(newHead, correctlyAnswered, insertAfter, db, language_id) {
-    console.log("RIGHT ANSWER IS RUNNING");
-    this.updateHead(newHead, db, language_id);
-    this.updatePlaceholder(insertAfter, db, language_id);
-    this.updateCorrectlyAnswered(correctlyAnswered, db, language_id);
+  async rightAnswer(newHead, correctlyAnswered, insertAfter, db, language_id) {
+    console.log("RIGHT ANSWER IS RUNNING");  
+    await this.updateHeadWord(newHead, db, language_id);
+    await this.updatePlaceholder(insertAfter, db, language_id, correctlyAnswered);
+    await this.updateCorrectlyAnswered(correctlyAnswered, db, language_id);
+    await this.updateTotalScore(correctlyAnswered, db, language_id);
+    await this.updateHead(newHead, db, language_id);
     return "updated";
   },
   updateCorrectlyAnswered(correct, db, language_id) {
     return db
-      .from("word")
-      .join("language", "word.language_id", "language.id")
-      .where({ "language.id": language_id, "word.id": correct.id })
+      .from("word")      
+      .where({ "language_id": language_id, "id": correct.id })
       .update({
-        "word.correct_count": correct.correct_count,
-        "word.memory_value": correct.memory_value,
-        "word.next": correct.next,
-        "language.total_score": correct.total_score
+        "correct_count": correct.correct_count,
+        "memory_value": correct.memory_value,
+        "next": correct.next,       
       });
+  },
+  updateTotalScore(correct, db, language_id){
+    return db
+      .from("language")
+      .where('id', language_id)
+      .update({
+        "total_score": correct.total_score
+      })
   }
+
+  
   /*  
 Set the word's new memory value as appropriate according to the algorithm.
 Update the incorrect count or correct count for that word.

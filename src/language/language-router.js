@@ -141,17 +141,22 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
         answer.next = null;
       } else {
 
+        let placeholderNext;
+        console.log('placeholder outside loop', placeholderNext)
         for (let i = 0; i < answer.memory_value + 1; i++) {
-          //query
-          nextWord = await LanguageService.getNextWord(req.app.get("db"), req.language.id, answer.next)
-          answer.next = nextWord.next
-          console.log('nextWord in loop:', nextWord)
-          // insertAfter = words[i];
+          placeholderNext = answer.next;
+          console.log('answer.next befoe loop',answer.next);
+          insertAfter= await LanguageService.getNextWord(req.app.get("db"), req.language.id, placeholderNext);
+          console.log('in loop',insertAfter);
+          placeholderNext = insertAfter[0].next;
+          console.log('placeholder in loop:', placeholderNext);
+       
         }
-        let answerNext = insertAfter.next;
+       
         // newHead[0].next = answer.next;
-        insertAfter.next = answer.id;
-        answer.next = answerNext;
+        insertAfter[0].next = answer.id;
+        answer.next = placeholderNext;
+        console.log('log answer.next after loop', answer.next)
       }
       console.log("INSERT AFTER LOOP", insertAfter);
       console.log("CORRECT ANSWER", answer);
@@ -188,7 +193,7 @@ languageRouter
         req.app.get('db'),
         req.language.id,
       )
-      res.head = head
+      res.head = head;
 
       next()
     }
