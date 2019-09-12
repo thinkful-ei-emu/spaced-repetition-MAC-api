@@ -1,5 +1,5 @@
 # Spaced repetition API!
-Live API Link: https://shrouded-springs-60057.herokuapp.com/
+Live API Link: <https://shrouded-springs-60057.herokuapp.com/>
 ## Local dev setup
 
 If using user `dunder-mifflin`:
@@ -50,3 +50,8 @@ Run the tests mode `npm test`
 Run the migrations up `npm run migrate`
 
 Run the migrations down `npm run migrate -- 0`
+
+
+##Deploy to Heroku
+
+Run
