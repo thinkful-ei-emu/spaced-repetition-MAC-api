@@ -102,6 +102,7 @@ const LanguageService = {
     return 'update head complete';
   },
   updateHead(newHead, db, language_id) {
+    console.log('update newhead ran')
     return db
       .from("language")
       .where("id", language_id)
@@ -109,13 +110,14 @@ const LanguageService = {
 
   },
   updateHeadWord(newHead, db, language_id) {
+    console.log('update head word ran')
     return db
       .from("word")
       .where({ "id": newHead.id, "language_id": language_id })
       .update("next", newHead.next);
   },
   updateIncorrectlyAnswered(incorrect, db, language_id) {
-
+  
     // return db.raw(
     //   `UPDATE word SET incorrect_count = ${incorrect.incorrect_count}, memory_value = ${incorrect.memory_value}, next = ${incorrect.next} FROM language WHERE word.language_id = language.id AND language.id = ${language_id} AND word.id = ${incorrect.id}`
     // );
@@ -128,13 +130,14 @@ const LanguageService = {
   },
   updatePlaceholder(placeholder, db, language_id, incorrectlyAnswered) {
     console.log('PLACEHOLDER', placeholder);
+    console.log('inplace holder', incorrectlyAnswered)
     // return db.raw(
     //   `UPDATE word SET next = ${placeholder.next} FROM language WHERE word.language_id = language.id AND language.id = ${language_id} AND word.id = ${placeholder.id}`
     // )
     return db
       .from('word')
-      .where({ 'language_id': language_id, 'id': incorrectlyAnswered.id })
-      .update({ 'next': placeholder });
+      .where({ 'language_id': language_id, 'id': placeholder.id })
+      .update({ 'next': incorrectlyAnswered.id });
   },
 
   /*  
@@ -184,13 +187,14 @@ const LanguageService = {
   async rightAnswer(newHead, correctlyAnswered, insertAfter, db, language_id) {
     console.log("RIGHT ANSWER IS RUNNING");  
     await this.updateHeadWord(newHead, db, language_id);
-    await this.updatePlaceholder(insertAfter, db, language_id, correctlyAnswered);
     await this.updateCorrectlyAnswered(correctlyAnswered, db, language_id);
+    await this.updatePlaceholder(insertAfter, db, language_id, correctlyAnswered);
     await this.updateTotalScore(correctlyAnswered, db, language_id);
     await this.updateHead(newHead, db, language_id);
     return "updated";
   },
   updateCorrectlyAnswered(correct, db, language_id) {
+    console.log('update correctly answered ran')
     return db
       .from("word")      
       .where({ "language_id": language_id, "id": correct.id })
@@ -201,6 +205,7 @@ const LanguageService = {
       });
   },
   updateTotalScore(correct, db, language_id){
+    console.log('update total score ran')
     return db
       .from("language")
       .where('id', language_id)
