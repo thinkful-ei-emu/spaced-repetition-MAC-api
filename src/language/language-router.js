@@ -39,41 +39,12 @@ languageRouter.get("/", async (req, res, next) => {
   }
 });
 
-/* languageRouter.all("/head", async (req, res, next) => {
-  try {
-    const head = await LanguageService.getLanguageHead(
-      req.app.get("db"),
-      req.language.head
-    );
-
-    res.json(head);
-
-    next();
-  } catch (error) {
-    next(error);
-  }
-}); */
-
-/* .get(jsonBodyParser, (req, res, next)=>{
-  const head = LanguageService.getLanguageHead(res.words)
-  return res.json({
-    nextWord: head.value.original,
-    wordCorrectCount: head.value.correct_count,
-    wordIncorrectCount: head.value.incorrect_count,
-    totalScore: head.value.total_score
-  })
-}) */
-
 languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
   try {
     const { guess } = req.body;
     if (!guess) {
       return res.status(400).json({ error: "Missing 'guess' in request body" });
     }
-  /*   let words = await LanguageService.getLanguageWords(
-      req.app.get("db"),
-      req.language.id
-    ); */
 
     let answer = await LanguageService.getAnswer(
       req.app.get("db"),
@@ -121,12 +92,7 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
       let newHead = nextWord[0]; //newhead
       let insertAfter;
       //need to find the spot for the answer to go into--m spots away
-      if (answer.memory_value > 10) { //based on max id instead of length
-
-        // while (words[i].next !== null) {
-        //   insertAfter = words[i];
-        //   i++;
-        // }
+      if (answer.memory_value > 10) { //based number of words in list
         insertAfter = await LanguageService.getLastWord(req.app.get('db', req.language.id))
         insertAfter[0].next = answer.id;
         answer.next = null;
@@ -174,25 +140,13 @@ languageRouter
         return res.status(404).json({
           error: `Cannot find word`,
         })}
-      return res.json(head[0])
+      return res.json(head[0]);
     
     }
     catch (error) {
-      next(error)
+      next(error);
     }
-  })
-/*   .get(jsonBodyParser, (req, res, next) => {
-    try {
-      if (!res.head){
-        return res.status(404).json({
-          error: `Cannot find word`,
-        })}
-      return res.json(res.head)
-    }
-    catch (error) {
-      next(error)
-    }
+  });
 
-  }); */
 
 module.exports = languageRouter;
