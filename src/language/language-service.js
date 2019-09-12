@@ -48,7 +48,7 @@ const LanguageService = {
         "incorrect_count",
         "memory_value"
       )
-      .where({ 'next': null, 'language_id': language_id });
+      .where({ next: null, language_id: language_id });
   },
 
   getNextWord(db, language_id, id) {
@@ -63,7 +63,7 @@ const LanguageService = {
         "incorrect_count",
         "memory_value"
       )
-      .where({ 'id': id, 'language_id': language_id })
+      .where({ id: id, language_id: language_id });
   },
 
   getAnswer(db, language_head) {
@@ -88,25 +88,30 @@ const LanguageService = {
     db,
     language_id
   ) {
-
-
-    await this.updateIncorrectlyAnswered(
-      incorrectlyAnswered,
+    console.log('FROM WRONG NASWER',placeholder, incorrectlyAnswered)
+    await this.updateIncorrectlyAnswered(incorrectlyAnswered, db, language_id);
+    console.log('!update')
+    await this.updatePlaceholder(
+      placeholder,
       db,
-      language_id
+      language_id,
+      incorrectlyAnswered
     );
-    console.log('incorrectly answer:', incorrectlyAnswered);
-    await this.updatePlaceholder(placeholder, db, language_id, incorrectlyAnswered);
+    console.log('!update2')
+
     await this.updateHeadWord(newHead, db, language_id);
+    console.log('!update3')
+
     await this.updateHead(newHead, db, language_id);
-    return 'update head complete';
+    console.log('!update4')
+
+    return "update head complete";
   },
   updateHead(newHead, db, language_id) {
     return db
       .from("language")
       .where("id", language_id)
       .update("head", newHead.id);
-
   },
   updateHeadWord(newHead, db, language_id) {
     return db
@@ -115,26 +120,29 @@ const LanguageService = {
       .update("next", newHead.next);
   },
   updateIncorrectlyAnswered(incorrect, db, language_id) {
-
     // return db.raw(
     //   `UPDATE word SET incorrect_count = ${incorrect.incorrect_count}, memory_value = ${incorrect.memory_value}, next = ${incorrect.next} FROM language WHERE word.language_id = language.id AND language.id = ${language_id} AND word.id = ${incorrect.id}`
     // );
-
+    console.log('INCORECT UPDATE')
     return db
-      .from('word')
-      .where({ 'language_id': language_id, 'id': incorrect.id })
-      .update({ 'incorrect_count': incorrect.incorrect_count, 'memory_value': incorrect.memory_value, 'next': incorrect.next });
-
+      .from("word")
+      .where({ language_id: language_id, id: incorrect.id })
+      .update({
+        "incorrect_count": incorrect.incorrect_count,
+        "memory_value": incorrect.memory_value,
+        "next": incorrect.next
+      });
   },
   updatePlaceholder(placeholder, db, language_id, incorrectlyAnswered) {
-    console.log('PLACEHOLDER', placeholder);
     // return db.raw(
     //   `UPDATE word SET next = ${placeholder.next} FROM language WHERE word.language_id = language.id AND language.id = ${language_id} AND word.id = ${placeholder.id}`
-    // )
+    // )    console.log('INCORECT UPDATE')
+    console.log('INCORECT PLACEHOLDER UPDATE')
+
     return db
-      .from('word')
-      .where({ 'language_id': language_id, 'id': incorrectlyAnswered.id })
-      .update({ 'next': placeholder });
+      .from("word")
+      .where({ "language_id": language_id, "id": placeholder.id })
+      .update({ "next": incorrectlyAnswered.id });
   },
 
   /*  
@@ -170,46 +178,50 @@ const LanguageService = {
    }, */
   getLanguageHead(db, language_id) {
     return db
-      .from('word')
-      .join('language', 'word.language_id', 'language.id')
+      .from("word")
+      .join("language", "word.language_id", "language.id")
       .select(
-        'word.original AS nextWord',
-        'language.total_score AS totalScore',
-        'word.correct_count AS wordCorrectCount',
-        'word.incorrect_count AS wordIncorrectCount'
-
-      ).where({ language_id });
+        "word.original AS nextWord",
+        "language.total_score AS totalScore",
+        "word.correct_count AS wordCorrectCount",
+        "word.incorrect_count AS wordIncorrectCount"
+      )
+      .where({ language_id });
   },
   //if head value equals user's guess:
   async rightAnswer(newHead, correctlyAnswered, insertAfter, db, language_id) {
-    console.log("RIGHT ANSWER IS RUNNING");  
     await this.updateHeadWord(newHead, db, language_id);
-    await this.updatePlaceholder(insertAfter, db, language_id, correctlyAnswered);
+    await this.updatePlaceholder(
+      insertAfter,
+      db,
+      language_id,
+      correctlyAnswered
+    );
     await this.updateCorrectlyAnswered(correctlyAnswered, db, language_id);
     await this.updateTotalScore(correctlyAnswered, db, language_id);
     await this.updateHead(newHead, db, language_id);
     return "updated";
   },
   updateCorrectlyAnswered(correct, db, language_id) {
+    console.log("UPDATE CORRECT", correct);
     return db
-      .from("word")      
+      .from("word")
       .where({ "language_id": language_id, "id": correct.id })
       .update({
         "correct_count": correct.correct_count,
         "memory_value": correct.memory_value,
-        "next": correct.next,       
+        "next": correct.next
       });
   },
-  updateTotalScore(correct, db, language_id){
+  updateTotalScore(correct, db, language_id) {
     return db
       .from("language")
-      .where('id', language_id)
+      .where("id", language_id)
       .update({
         "total_score": correct.total_score
-      })
+      });
   }
 
-  
   /*  
 Set the word's new memory value as appropriate according to the algorithm.
 Update the incorrect count or correct count for that word.

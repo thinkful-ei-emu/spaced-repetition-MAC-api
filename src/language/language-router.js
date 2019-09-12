@@ -76,10 +76,6 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
       req.language.id
     );
 
-    console.log('before', words)
-
-
-
     let answer = await LanguageService.getAnswer(
       req.app.get("db"),
       req.language.id,
@@ -101,22 +97,22 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
         answer: answer.translation,
         isCorrect: false
       };
-      console.log('after response')
       //if answer incorrect: reset memory value to 1, move back 1 spot in list//to second--basically swap
       answer.memory_value = 1;
       answer.incorrect_count = answer.incorrect_count + 1;
       let newHead = nextWord[0] //request to get next word;
       let incorrectlyAnswered = answer;
-      let placeholder = newHead.next; //from newhead
-      newHead.next = incorrectlyAnswered.id; //setting newhead to incorrect anwser id
-      incorrectlyAnswered.next = placeholder;
+      let placeholder = newHead.id; //from newhead
+     
       console.log("INCORRECT ANSWER", incorrectlyAnswered);
       console.log("NEW HEAD", newHead);
-
+      placeholder = await LanguageService.getNextWord(req.app.get('db'), req.language.id, placeholder)
+      newHead.next = incorrectlyAnswered.id; //setting newhead to incorrect anwser id
+      incorrectlyAnswered.next = placeholder[0].id;
       await LanguageService.wrongAnswer(
         newHead,
         incorrectlyAnswered,
-        placeholder,
+        placeholder[0],
         req.app.get("db"),
         req.language.id
       );
@@ -135,37 +131,27 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
         //   insertAfter = words[i];
         //   i++;
         // }
-        let insertAfter = await LanguageService.getLastWord(req.app.get('db', req.language.id))
-        insertAfter.next = answer;
-        console.log('insertafter in memory loop', insertAfter)
+        insertAfter = await LanguageService.getLastWord(req.app.get('db', req.language.id))
+        insertAfter[0].next = answer.id;
         answer.next = null;
       } else {
-
-        let placeholderNext;
-        console.log('placeholder outside loop', placeholderNext)
-        for (let i = 0; i < answer.memory_value + 1; i++) {
-          placeholderNext = answer.next;
-          console.log('answer.next befoe loop',answer.next);
+        let placeholderNext = answer.next;
+        for (let i = 0; i < answer.memory_value; i++) {
           insertAfter= await LanguageService.getNextWord(req.app.get("db"), req.language.id, placeholderNext);
           console.log('in loop',insertAfter);
           placeholderNext = insertAfter[0].next;
           console.log('placeholder in loop:', placeholderNext);
-       
         }
-       
-        // newHead[0].next = answer.next;
         insertAfter[0].next = answer.id;
         answer.next = placeholderNext;
-        console.log('log answer.next after loop', answer.next)
       }
-      console.log("INSERT AFTER LOOP", insertAfter);
       console.log("CORRECT ANSWER", answer);
       console.log("NEW HEAD", newHead);
       console.log("INSERT AFTER", insertAfter);
       await LanguageService.rightAnswer(
         newHead,
         answer,
-        insertAfter,
+        insertAfter[0],
         req.app.get("db"),
         req.language.id
       );
@@ -179,7 +165,6 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
         isCorrect: true
       };
     }
-    console.log('after', words)
     res.status(200).json({ response });
   } catch (error) {
     next(error);
