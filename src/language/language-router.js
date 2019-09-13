@@ -108,7 +108,7 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
         
         for (let i = 0; i < answer.memory_value; i++) {        
           if(placeholderNext === null){           
-            insertAfter = await LanguageService.getLastWord(req.app.get('db'), req.language.id);  
+            insertAfter = await LanguageService.getLastWord(req.app.get('db'), req.language.id);          
           }
           else{
             insertAfter= await LanguageService.getNextWord(req.app.get("db"), req.language.id, placeholderNext);
