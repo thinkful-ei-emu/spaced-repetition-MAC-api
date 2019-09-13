@@ -56,6 +56,7 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
     let response = {};
     if (answer.translation != guess) {
       //formatting response
+      answer.incorrect_count = answer.incorrect_count + 1;
       response = {
         nextWord: nextWord[0].original,
         // wordCorrectCount: nextWord[0].correct_count,
@@ -68,7 +69,7 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
       };
       //if answer incorrect: reset memory value to 1, move back 1 spot in list//to second--basically swap
       answer.memory_value = 1;
-      answer.incorrect_count = answer.incorrect_count + 1;
+      // answer.incorrect_count = answer.incorrect_count + 1;
       let newHead = nextWord[0] //request to get next word;
       let incorrectlyAnswered = answer;
       
