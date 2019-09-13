@@ -59,8 +59,8 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
       answer.incorrect_count = answer.incorrect_count + 1;
       response = {
         nextWord: nextWord[0].original,
-        // wordCorrectCount: nextWord[0].correct_count,
-        // wordIncorrectCount: nextWord[0].incorrect_count,
+        nextWordCorrectCount: nextWord[0].correct_count,
+        nextWordIncorrectCount: nextWord[0].incorrect_count,
         wordCorrectCount: answer.correct_count,
         wordIncorrectCount: answer.incorrect_count,
         totalScore: answer.total_score,
@@ -127,8 +127,8 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
 
       response = {
         nextWord: newHead.original,
-        // wordCorrectCount: newHead.correct_count,
-        // wordIncorrectCount: newHead.incorrect_count,
+        nextWordCorrectCount: nextWord[0].correct_count,
+        nextWordIncorrectCount: nextWord[0].incorrect_count,
         wordCorrectCount: answer.correct_count,
         wordIncorrectCount: answer.incorrect_count,
         totalScore: answer.total_score,
