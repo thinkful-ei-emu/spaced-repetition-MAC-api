@@ -42,20 +42,17 @@ languageRouter.get("/", async (req, res, next) => {
 languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
   try {
     const { guess } = req.body;
-    console.log(req.body)
     if (!guess) {
       return res.status(400).json({ error: "Missing 'guess' in request body" });
     }
-
+//get answer--which is head
     let answer = await LanguageService.getAnswer(
       req.app.get("db"),
       req.language.id,
     );
-    console.log(answer)
     answer = answer[0];
-
+//get word after head
     let nextWord = await LanguageService.getNextWord(req.app.get("db"), req.language.id, answer.next)
-    console.log(nextWord)
     let response = {};
     if (answer.translation != guess) {
       //formatting response
@@ -72,16 +69,14 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
       answer.incorrect_count = answer.incorrect_count + 1;
       let newHead = nextWord[0] //request to get next word;
       let incorrectlyAnswered = answer;
-      let placeholder = newHead.id; //from newhead
+      
+      let placeholderId = newHead.next; //from newhead
      
-    
-      placeholder = await LanguageService.getNextWord(req.app.get('db'), req.language.id, placeholder)
       newHead.next = incorrectlyAnswered.id; //setting newhead to incorrect anwser id
-      incorrectlyAnswered.next = placeholder[0].id;
+      incorrectlyAnswered.next = placeholderId;
       await LanguageService.wrongAnswer(
         newHead,
         incorrectlyAnswered,
-        placeholder[0],
         req.app.get("db"),
         req.language.id
       );

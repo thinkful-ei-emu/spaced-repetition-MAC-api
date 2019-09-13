@@ -83,17 +83,17 @@ const LanguageService = {
   async wrongAnswer(
     newHead,
     incorrectlyAnswered,
-    placeholder,
+    //placeholder,
     db,
     language_id
   ) {
     await this.updateIncorrectlyAnswered(incorrectlyAnswered, db, language_id);
-    await this.updatePlaceholder(
+   /*  await this.updatePlaceholder(
       placeholder,
       db,
       language_id,
       incorrectlyAnswered
-    );
+    ); */
     await this.updateHeadWord(newHead, db, language_id);
     await this.updateHead(newHead, db, language_id); 
     return "update head complete";
