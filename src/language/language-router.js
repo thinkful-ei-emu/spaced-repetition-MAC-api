@@ -65,6 +65,7 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
         wordIncorrectCount: answer.incorrect_count,
         totalScore: answer.total_score,
         answer: answer.translation,
+        original: answer.original,        
         isCorrect: false
       };
       //if answer incorrect: reset memory value to 1, move back 1 spot in list//to second--basically swap
@@ -129,6 +130,7 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
         wordIncorrectCount: answer.incorrect_count,
         totalScore: answer.total_score,
         answer: answer.translation,
+        original: answer.original, 
         isCorrect: true
       };
     }

@@ -189,6 +189,7 @@ describe('Language Endpoints', function () {
             nextWordCorrectCount: 0,
             nextWordIncorrectCount: 0,
             answer: testLanguagesWords[0].translation,
+            original: testLanguagesWords[0].original,
             isCorrect: false
           });
       });
@@ -211,6 +212,7 @@ describe('Language Endpoints', function () {
             nextWordCorrectCount: 0,
             nextWordIncorrectCount: 1,
             answer: testLanguagesWords[1].translation,
+            original: testLanguagesWords[1].original,
             isCorrect: false
           });
       });
@@ -238,6 +240,7 @@ describe('Language Endpoints', function () {
             nextWordCorrectCount: 0,
             nextWordIncorrectCount: 0,
             answer: testLanguagesWords[0].translation,
+            original: testLanguagesWords[0].original,
             isCorrect: true
           });
       });
@@ -266,6 +269,7 @@ describe('Language Endpoints', function () {
             nextWordCorrectCount: 0,
             nextWordIncorrectCount: 0,
             answer: testLanguagesWords[1].translation,
+            original: testLanguagesWords[1].original,
             isCorrect: true
           });
 
@@ -284,6 +288,7 @@ describe('Language Endpoints', function () {
             nextWordCorrectCount: 1,
             nextWordIncorrectCount: 0,
             answer: testLanguagesWords[2].translation,
+            original: testLanguagesWords[2].original,
             isCorrect: true
           });
       });
