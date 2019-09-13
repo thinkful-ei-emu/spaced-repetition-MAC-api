@@ -56,17 +56,20 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
     let response = {};
     if (answer.translation != guess) {
       //formatting response
+      answer.incorrect_count = answer.incorrect_count + 1;
       response = {
         nextWord: nextWord[0].original,
-        wordCorrectCount: nextWord[0].correct_count,
-        wordIncorrectCount: nextWord[0].incorrect_count,
+        nextWordCorrectCount: nextWord[0].correct_count,
+        nextWordIncorrectCount: nextWord[0].incorrect_count,
+        wordCorrectCount: answer.correct_count,
+        wordIncorrectCount: answer.incorrect_count,
         totalScore: answer.total_score,
         answer: answer.translation,
         isCorrect: false
       };
       //if answer incorrect: reset memory value to 1, move back 1 spot in list//to second--basically swap
       answer.memory_value = 1;
-      answer.incorrect_count = answer.incorrect_count + 1;
+      // answer.incorrect_count = answer.incorrect_count + 1;
       let newHead = nextWord[0] //request to get next word;
       let incorrectlyAnswered = answer;
       
@@ -88,15 +91,11 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
       //set head to answer's next pointer
       let newHead = nextWord[0]; //newhead
       let insertAfter;
-      //need to find the spot for the answer to go into--m spots away
-      console.log('memory val num:', answer.memory_value)
-      if (answer.memory_value > 10) { //based number of words in list
-        console.log('in greater than 10 running')
+      //need to find the spot for the answer to go into--m spots away      
+      if (answer.memory_value > 10) { //based number of words in list       
         answer.next = null;
-        insertAfter = await LanguageService.getLastWord(req.app.get('db'), req.language.id);  
-        console.log('in greater before index', insertAfter);  
+        insertAfter = await LanguageService.getLastWord(req.app.get('db'), req.language.id);        
         insertAfter[0].next = answer.id;
-        console.log('in greater than 10', insertAfter);
         // answer.next = null;
       } else {
         let placeholderNext = answer.next;
@@ -124,8 +123,10 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
 
       response = {
         nextWord: newHead.original,
-        wordCorrectCount: newHead.correct_count,
-        wordIncorrectCount: newHead.incorrect_count,
+        nextWordCorrectCount: nextWord[0].correct_count,
+        nextWordIncorrectCount: nextWord[0].incorrect_count,
+        wordCorrectCount: answer.correct_count,
+        wordIncorrectCount: answer.incorrect_count,
         totalScore: answer.total_score,
         answer: answer.translation,
         isCorrect: true

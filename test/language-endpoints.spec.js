@@ -1,7 +1,7 @@
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe.only('Language Endpoints', function () {
+describe('Language Endpoints', function () {
   let db;
 
   const testUsers = helpers.makeUsersArray();
@@ -132,7 +132,7 @@ describe.only('Language Endpoints', function () {
             nextWord: headWord.original,
             totalScore: 0,
             wordCorrectCount: 0,
-            wordIncorrectCount: 0,
+            wordIncorrectCount: 0,         
           });
       });
     });
@@ -185,7 +185,9 @@ describe.only('Language Endpoints', function () {
             nextWord: testLanguagesWords[1].original,
             totalScore: 0,
             wordCorrectCount: 0,
-            wordIncorrectCount: 0,
+            wordIncorrectCount: 1,
+            nextWordCorrectCount: 0,
+            nextWordIncorrectCount: 0,
             answer: testLanguagesWords[0].translation,
             isCorrect: false
           });
@@ -206,6 +208,8 @@ describe.only('Language Endpoints', function () {
             totalScore: 0,
             wordCorrectCount: 0,
             wordIncorrectCount: 1,
+            nextWordCorrectCount: 0,
+            nextWordIncorrectCount: 1,
             answer: testLanguagesWords[1].translation,
             isCorrect: false
           });
@@ -229,8 +233,10 @@ describe.only('Language Endpoints', function () {
           .expect({
             nextWord: testLanguagesWords[1].original,
             totalScore: 1,
-            wordCorrectCount: 0,
+            wordCorrectCount: 1,
             wordIncorrectCount: 0,
+            nextWordCorrectCount: 0,
+            nextWordIncorrectCount: 0,
             answer: testLanguagesWords[0].translation,
             isCorrect: true
           });
@@ -255,8 +261,10 @@ describe.only('Language Endpoints', function () {
           .expect({
             nextWord: testLanguagesWords[2].original,
             totalScore: 2,
-            wordCorrectCount: 0,
+            wordCorrectCount: 1,
             wordIncorrectCount: 0,
+            nextWordCorrectCount: 0,
+            nextWordIncorrectCount: 0,
             answer: testLanguagesWords[1].translation,
             isCorrect: true
           });
@@ -273,6 +281,8 @@ describe.only('Language Endpoints', function () {
             totalScore: 3,
             wordCorrectCount: 1,
             wordIncorrectCount: 0,
+            nextWordCorrectCount: 1,
+            nextWordIncorrectCount: 0,
             answer: testLanguagesWords[2].translation,
             isCorrect: true
           });
