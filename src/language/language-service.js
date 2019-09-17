@@ -26,7 +26,7 @@ const LanguageService = {
         "correct_count",
         "incorrect_count"
       )
-      .where({ language_id });
+      .where({ language_id })
   },
 
   getLastWord(db, language_id) {
@@ -45,7 +45,7 @@ const LanguageService = {
       .andWhere({ language_id });
   },
 
-  getNextWord(db, language_id, id) {
+  getNextWord(db, language_id, id) { 
     return db
       .from("word")
       .select(
@@ -57,10 +57,11 @@ const LanguageService = {
         "incorrect_count",
         "memory_value"
       )
-      .where({ id: id, language_id: language_id });
+      .where({"id": id, "language_id":language_id })
+     
   },
 
-  getAnswer(db, language_head) {
+  getAnswer(db, language_id) {
     return db
       .from("word")
       .join("language", "word.id", "language.head")
@@ -73,22 +74,16 @@ const LanguageService = {
         "word.correct_count",
         "word.incorrect_count",
         "word.memory_value"
-      );
+      )
+      .where({ language_id })
   },
   async wrongAnswer(
     newHead,
-    incorrectlyAnswered,
-    //placeholder,
+    incorrectlyAnswered,  
     db,
     language_id
   ) {
-    await this.updateIncorrectlyAnswered(incorrectlyAnswered, db, language_id);
-    /*  await this.updatePlaceholder(
-       placeholder,
-       db,
-       language_id,
-       incorrectlyAnswered
-     ); */
+    await this.updateIncorrectlyAnswered(incorrectlyAnswered, db, language_id);   
     await this.updateHeadWord(newHead, db, language_id);
     await this.updateHead(newHead, db, language_id);
     return "update head complete";

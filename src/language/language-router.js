@@ -41,21 +41,25 @@ languageRouter.get("/", async (req, res, next) => {
 
 languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
   try {
-    const { guess } = req.body;
+    const { guess } = req.body;  
     if (!guess) {
       return res.status(400).json({ error: "Missing 'guess' in request body" });
     }
-//get answer--which is head
+    //get answer--which is head
     let answer = await LanguageService.getAnswer(
       req.app.get("db"),
       req.language.id,
     );
-    answer = answer[0];
-//get word after head
+
+    answer = answer[0];    
+    //get word after head    
     let nextWord = await LanguageService.getNextWord(req.app.get("db"), req.language.id, answer.next)
-    let response = {};
+    
+
+    let response = {};   
     if (answer.translation != guess) {
       //formatting response
+
       answer.incorrect_count = answer.incorrect_count + 1;
       response = {
         nextWord: nextWord[0].original,
@@ -65,17 +69,17 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
         wordIncorrectCount: answer.incorrect_count,
         totalScore: answer.total_score,
         answer: answer.translation,
-        original: answer.original,        
+        original: answer.original,
         isCorrect: false
-      };
+      };      
       //if answer incorrect: reset memory value to 1, move back 1 spot in list//to second--basically swap
       answer.memory_value = 1;
       // answer.incorrect_count = answer.incorrect_count + 1;
       let newHead = nextWord[0] //request to get next word;
       let incorrectlyAnswered = answer;
-      
+
       let placeholderId = newHead.next; //from newhead
-     
+
       newHead.next = incorrectlyAnswered.id; //setting newhead to incorrect anwser id
       incorrectlyAnswered.next = placeholderId;
       await LanguageService.wrongAnswer(
@@ -95,25 +99,24 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
       //need to find the spot for the answer to go into--m spots away      
       if (answer.memory_value > 10) { //based number of words in list       
         answer.next = null;
-        insertAfter = await LanguageService.getLastWord(req.app.get('db'), req.language.id);        
-        insertAfter[0].next = answer.id;
-        // answer.next = null;
+        insertAfter = await LanguageService.getLastWord(req.app.get('db'), req.language.id);
+        insertAfter[0].next = answer.id;        
       } else {
-        let placeholderNext = answer.next;
-        
-        for (let i = 0; i < answer.memory_value; i++) {        
-          if(placeholderNext === null){           
-            insertAfter = await LanguageService.getLastWord(req.app.get('db'), req.language.id);          
+        let placeholderNext = answer.next;    
+
+        for (let i = 0; i < answer.memory_value; i++) {
+          if (placeholderNext === null) {           
+            insertAfter = await LanguageService.getLastWord(req.app.get('db'), req.language.id);
           }
-          else{
-            insertAfter= await LanguageService.getNextWord(req.app.get("db"), req.language.id, placeholderNext);
+          else {
+            insertAfter = await LanguageService.getNextWord(req.app.get("db"), req.language.id, placeholderNext);           
             placeholderNext = insertAfter[0].next;
           }
-        }      
+        }       
         insertAfter[0].next = answer.id;
         answer.next = placeholderNext;
       }
-     
+
       await LanguageService.rightAnswer(
         newHead,
         answer,
@@ -130,7 +133,7 @@ languageRouter.post("/guess", jsonBodyParser, async (req, res, next) => {
         wordIncorrectCount: answer.incorrect_count,
         totalScore: answer.total_score,
         answer: answer.translation,
-        original: answer.original, 
+        original: answer.original,
         isCorrect: true
       };
     }
@@ -147,12 +150,13 @@ languageRouter
         req.app.get('db'),
         req.language.id,
       )
-      if (!head){
+      if (!head) {
         return res.status(404).json({
-          error: `Cannot find word`,
-        })}
+          error: 'Cannot find word',
+        });
+      }
       return res.json(head[0]);
-    
+
     }
     catch (error) {
       next(error);
